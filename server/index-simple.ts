@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
-import telegramWebhookRouter from "./routes/telegramWebhookMinimal";
+import telegramWebhookRouter from "./routes/telegramWebhookImproved";
 
 async function startServer() {
   // Log environment
