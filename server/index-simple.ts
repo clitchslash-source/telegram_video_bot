@@ -1,7 +1,7 @@
 import "dotenv/config";
 import express from "express";
 import { createServer } from "http";
-import telegramWebhookRouter from "./routes/telegramWebhook";
+import telegramWebhookRouter from "./routes/telegramWebhookMinimal";
 
 async function startServer() {
   // Log environment
@@ -24,8 +24,20 @@ async function startServer() {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // Telegram webhook routes
+  // Telegram webhook routes (minimal handler)
   app.use("/api/telegram", telegramWebhookRouter);
+  
+  // Info endpoint for debugging
+  app.get("/info", (req, res) => {
+    res.json({
+      status: "ok",
+      environment: process.env.NODE_ENV,
+      has_database_url: !!process.env.DATABASE_URL,
+      has_telegram_token: !!process.env.TELEGRAM_BOT_TOKEN,
+      has_kie_ai_key: !!process.env.KIE_AI_API_KEY,
+      timestamp: new Date().toISOString(),
+    });
+  });
 
   // 404 handler
   app.use("*", (req, res) => {
