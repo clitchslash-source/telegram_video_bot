@@ -19,6 +19,13 @@ export function registerOAuthRoutes(app: Express) {
       return;
     }
 
+    // Check if OAuth is configured
+    if (!process.env.OAUTH_SERVER_URL) {
+      console.warn("[OAuth] OAuth not configured, skipping callback");
+      res.status(503).json({ error: "OAuth is not configured" });
+      return;
+    }
+
     try {
       const tokenResponse = await sdk.exchangeCodeForToken(code, state);
       const userInfo = await sdk.getUserInfo(tokenResponse.accessToken);
