@@ -103,3 +103,15 @@
 - [x] Create environment configuration template
 - [x] Document all setup steps
 - [x] Create troubleshooting guide
+
+
+## Debugging & Fixes
+
+### Issues Found
+- [ ] Bot not responding to commands
+- [ ] Notion table is empty
+- [ ] Check Railway logs for errors
+- [ ] Verify webhook is receiving messages
+- [ ] Check database connection
+- [ ] Verify Notion API integration
+- [ ] Test bot handlers locally

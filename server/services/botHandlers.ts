@@ -1,4 +1,13 @@
-import { getTelegramUser, createTelegramUser, addTokensToUser, deductTokensFromUser, createTokenTransaction, createVideoGeneration, getTelegramUser as getUserData, updateTelegramUserBalance } from "../db";
+import {
+  getTelegramUser,
+  createTelegramUser,
+  addTokensToUser,
+  deductTokensFromUser,
+  createTokenTransaction,
+  createVideoGeneration,
+  updateTelegramUserBalance,
+  createPaymentTransaction,
+} from "../db";
 import { telegramBotClient } from "./telegramBotClient";
 import { kieAiClient } from "./kieAiClient";
 import { yandexKassaClient } from "./yandexKassaClient";
@@ -43,9 +52,9 @@ export async function handleStartCommand(chatId: number | string, userId: number
           lastInteractionAt: new Date().toISOString(),
           createdAt: new Date().toISOString(),
         });
-      } catch (error) {
-        console.error("[Bot] Notion sync error:", error);
-      }
+} catch (notionError) {
+    console.error("[Bot] Notion sync error:", notionError);
+  }
     } else {
       // Returning user - show balance
       await telegramBotClient.sendBalanceMessage(chatId, user.tokenBalance);
