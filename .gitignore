@@ -3,7 +3,7 @@
 .pnpm-store/
 
 # Build outputs
-dist/
+# dist/ - Keep dist folder for production builds
 build/
 *.dist
 
