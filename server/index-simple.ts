@@ -4,6 +4,14 @@ import { createServer } from "http";
 import telegramWebhookRouter from "./routes/telegramWebhook";
 
 async function startServer() {
+  // Log environment
+  console.log("🔧 Environment:");
+  console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`   DATABASE_URL: ${process.env.DATABASE_URL ? "✅ Set" : "❌ Not set"}`);
+  console.log(`   TELEGRAM_BOT_TOKEN: ${process.env.TELEGRAM_BOT_TOKEN ? "✅ Set" : "❌ Not set"}`);
+  console.log(`   KIE_AI_API_KEY: ${process.env.KIE_AI_API_KEY ? "✅ Set" : "❌ Not set"}`);
+  console.log();
+
   const app = express();
   const server = createServer(app);
 

@@ -21,40 +21,39 @@ router.post("/webhook", async (req: Request, res: Response) => {
       const username = message.from.username;
       const lastName = message.from.last_name;
 
-      // Handle /start command
-      if (message.text === "/start") {
-        await handleStartCommand(chatId, userId, firstName, username, lastName);
-      }
-
-      // Handle /balance command
-      else if (message.text === "/balance") {
-        await handleBalanceCommand(chatId, userId);
-      }
-
-      // Handle /buy command
-      else if (message.text === "/buy") {
-        await handleBuyCommand(chatId, userId);
-      }
-
-      // Handle /help command
-      else if (message.text === "/help") {
-        await handleHelpCommand(chatId);
-      }
-
-      // Handle text messages (video generation prompts)
-      else if (message.text && !message.text.startsWith("/")) {
-        await handleTextMessage(chatId, userId, message.text);
-      }
-
-      // Handle photo messages
-      else if (message.photo) {
-        const largestPhoto = message.photo[message.photo.length - 1];
-        await handleImageMessage(chatId, userId, largestPhoto.file_id);
-      }
-
-      // Handle voice messages
-      else if (message.voice) {
-        await handleVoiceMessage(chatId, userId, message.voice.file_id);
+      try {
+        // Handle /start command
+        if (message.text === "/start") {
+          await handleStartCommand(chatId, userId, firstName, username, lastName);
+        }
+        // Handle /balance command
+        else if (message.text === "/balance") {
+          await handleBalanceCommand(chatId, userId);
+        }
+        // Handle /buy command
+        else if (message.text === "/buy") {
+          await handleBuyCommand(chatId, userId);
+        }
+        // Handle /help command
+        else if (message.text === "/help") {
+          await handleHelpCommand(chatId);
+        }
+        // Handle text messages (video generation prompts)
+        else if (message.text && !message.text.startsWith("/")) {
+          await handleTextMessage(chatId, userId, message.text);
+        }
+        // Handle photo messages
+        else if (message.photo) {
+          const largestPhoto = message.photo[message.photo.length - 1];
+          await handleImageMessage(chatId, userId, largestPhoto.file_id);
+        }
+        // Handle voice messages
+        else if (message.voice) {
+          await handleVoiceMessage(chatId, userId, message.voice.file_id);
+        }
+      } catch (handlerError) {
+        console.error("[Telegram Webhook] Handler error:", handlerError);
+        // Still return 200 to acknowledge receipt
       }
     }
 
@@ -66,13 +65,19 @@ router.post("/webhook", async (req: Request, res: Response) => {
       const userId = callbackQuery.from.id;
       const data = callbackQuery.data;
 
-      await handleCallbackQuery(callbackQueryId, chatId, userId, data);
+      try {
+        await handleCallbackQuery(callbackQueryId, chatId, userId, data);
+      } catch (handlerError) {
+        console.error("[Telegram Webhook] Callback handler error:", handlerError);
+        // Still return 200 to acknowledge receipt
+      }
     }
 
     res.json({ ok: true });
   } catch (error) {
     console.error("[Telegram Webhook] Error:", error);
-    res.status(500).json({ ok: false, error: "Internal server error" });
+    // Return 200 anyway to prevent Telegram from retrying
+    res.json({ ok: true });
   }
 });
 

@@ -941,21 +941,25 @@ router.post("/webhook", async (req, res) => {
       const firstName = message.from.first_name;
       const username = message.from.username;
       const lastName = message.from.last_name;
-      if (message.text === "/start") {
-        await handleStartCommand(chatId, userId, firstName, username, lastName);
-      } else if (message.text === "/balance") {
-        await handleBalanceCommand(chatId, userId);
-      } else if (message.text === "/buy") {
-        await handleBuyCommand(chatId, userId);
-      } else if (message.text === "/help") {
-        await handleHelpCommand(chatId);
-      } else if (message.text && !message.text.startsWith("/")) {
-        await handleTextMessage(chatId, userId, message.text);
-      } else if (message.photo) {
-        const largestPhoto = message.photo[message.photo.length - 1];
-        await handleImageMessage(chatId, userId, largestPhoto.file_id);
-      } else if (message.voice) {
-        await handleVoiceMessage(chatId, userId, message.voice.file_id);
+      try {
+        if (message.text === "/start") {
+          await handleStartCommand(chatId, userId, firstName, username, lastName);
+        } else if (message.text === "/balance") {
+          await handleBalanceCommand(chatId, userId);
+        } else if (message.text === "/buy") {
+          await handleBuyCommand(chatId, userId);
+        } else if (message.text === "/help") {
+          await handleHelpCommand(chatId);
+        } else if (message.text && !message.text.startsWith("/")) {
+          await handleTextMessage(chatId, userId, message.text);
+        } else if (message.photo) {
+          const largestPhoto = message.photo[message.photo.length - 1];
+          await handleImageMessage(chatId, userId, largestPhoto.file_id);
+        } else if (message.voice) {
+          await handleVoiceMessage(chatId, userId, message.voice.file_id);
+        }
+      } catch (handlerError) {
+        console.error("[Telegram Webhook] Handler error:", handlerError);
       }
     }
     if (update.callback_query) {
@@ -964,12 +968,16 @@ router.post("/webhook", async (req, res) => {
       const chatId = callbackQuery.message.chat.id;
       const userId = callbackQuery.from.id;
       const data = callbackQuery.data;
-      await handleCallbackQuery(callbackQueryId, chatId, userId, data);
+      try {
+        await handleCallbackQuery(callbackQueryId, chatId, userId, data);
+      } catch (handlerError) {
+        console.error("[Telegram Webhook] Callback handler error:", handlerError);
+      }
     }
     res.json({ ok: true });
   } catch (error) {
     console.error("[Telegram Webhook] Error:", error);
-    res.status(500).json({ ok: false, error: "Internal server error" });
+    res.json({ ok: true });
   }
 });
 router.post("/payment-webhook", async (req, res) => {
@@ -999,6 +1007,12 @@ var telegramWebhook_default = router;
 
 // server/index-simple.ts
 async function startServer() {
+  console.log("\u{1F527} Environment:");
+  console.log(`   NODE_ENV: ${process.env.NODE_ENV}`);
+  console.log(`   DATABASE_URL: ${process.env.DATABASE_URL ? "\u2705 Set" : "\u274C Not set"}`);
+  console.log(`   TELEGRAM_BOT_TOKEN: ${process.env.TELEGRAM_BOT_TOKEN ? "\u2705 Set" : "\u274C Not set"}`);
+  console.log(`   KIE_AI_API_KEY: ${process.env.KIE_AI_API_KEY ? "\u2705 Set" : "\u274C Not set"}`);
+  console.log();
   const app = express2();
   const server = createServer(app);
   app.use(express2.json({ limit: "50mb" }));
